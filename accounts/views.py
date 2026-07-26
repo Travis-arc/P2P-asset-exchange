@@ -12,6 +12,12 @@ from .models import CustomUser
 from .tokens import email_verification_token
 
 
+def home_redirect_view(request):
+    if request.user.is_authenticated:
+        return redirect('accounts:profile')
+    return redirect('accounts:register')
+
+
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
