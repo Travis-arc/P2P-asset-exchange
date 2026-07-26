@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{% if editing %}Edit Listing{% else %}List an Item{% endif %}{% endblock %}
+{% block content %}
+<div style="max-width: 520px; margin: 0 auto;">
+    <div class="card">
+        <h1>{% if editing %}Edit listing{% else %}List an item{% endif %}</h1>
+        <p class="helptext" style="margin-top: 0; margin-bottom: 16px;">{% if editing %}Update the details below.{% else %}Share something with your campus community.{% endif %}</p>
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<div class="helptext" style="margin-top: 4px;">{{ field.help_text }}</div>{% endif %}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+            <button type="submit" style="width: 100%; text-align: center;">{% if editing %}Save changes{% else %}Create listing{% endif %}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

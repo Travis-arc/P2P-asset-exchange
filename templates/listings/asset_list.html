@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Browse Listings{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+    <div>
+        <h1 style="margin-bottom: 4px;">Browse Listings</h1>
+        <p class="helptext" style="margin-top: 0;">Find and reserve assets from your university peers</p>
+    </div>
+    <a class="btn" href="{% url 'listings:asset_create' %}" style="margin-top: 0;">+ List an item</a>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+    <form method="get">
+        <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 240px;">
+                <label for="id_q" style="margin-top: 0;">Search</label>
+                <input type="text" id="id_q" name="q" value="{{ query }}" placeholder="Search items, owners, departments...">
+            </div>
+            <div style="width: 180px;">
+                <label for="id_condition" style="margin-top: 0;">Condition</label>
+                <select id="id_condition" name="condition">
+                    <option value="">Any Condition</option>
+                    {% for value, label in conditions %}
+                        <option value="{{ value }}" {% if selected_condition == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="hidden" name="category" value="{{ selected_category }}">
+            <button type="submit" style="margin-top: 0;">Apply</button>
+        </div>
+    </form>
+
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;">
+        <a href="?q={{ query }}&condition={{ selected_condition }}&category="
+           class="chip {% if not selected_category %}chip-active{% endif %}">All</a>
+        {% for category in categories %}
+            <a href="?q={{ query }}&condition={{ selected_condition }}&category={{ category.id }}"
+               class="chip {% if selected_category == category.id|stringformat:'s' %}chip-active{% endif %}">{{ category.name }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+{% if assets %}
+    <p class="helptext" style="margin-bottom: 12px;">{{ assets.paginator.count }} item{{ assets.paginator.count|pluralize }} found</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+        {% for asset in assets %}
+            <div class="card" style="padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <a href="{% url 'listings:asset_detail' asset.pk %}" style="color: var(--accent); text-decoration: none; font-weight: 600; font-size: 15px;">{{ asset.title }}</a>
+                    <span class="badge {% if asset.status == 'available' %}badge-green{% elif asset.status == 'reserved' %}badge-amber{% else %}badge-red{% endif %}" style="flex-shrink: 0;">&#9679; {{ asset.get_status_display }}</span>
+                </div>
+                <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                    <span class="pill">{{ asset.category.name }}</span>
+                    <span class="helptext">{{ asset.get_condition_display }}</span>
+                </div>
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin: 12px 0; min-height: 40px;">{{ asset.description|truncatewords:16|default:"No description provided." }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px; margin-top: 8px;">
+                    <div>
+                        <div style="font-size: 13.5px; font-weight: 600;">{{ asset.owner.username }}</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">{{ asset.owner.department|default:"—" }}</div>
+                    </div>
+                    {% if asset.status == 'available' and user != asset.owner %}
+                        <form method="post" action="{% url 'transactions:reservation_request' asset.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" style="margin-top: 0; padding: 8px 16px; font-size: 13px;">Reserve</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if assets.has_other_pages %}
+    <div style="margin-top:24px; text-align: center;">
+        {% if assets.has_previous %}
+            <a class="btn" href="?page={{ assets.previous_page_number }}&q={{ query }}&category={{ selected_category }}&condition={{ selected_condition }}">&larr; Previous</a>
+        {% endif %}
+        <span class="helptext" style="margin: 0 12px;">Page {{ assets.number }} of {{ assets.paginator.num_pages }}</span>
+        {% if assets.has_next %}
+            <a class="btn" href="?page={{ assets.next_page_number }}&q={{ query }}&category={{ selected_category }}&condition={{ selected_condition }}">Next &rarr;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+{% else %}
+    <div class="card" style="text-align: center; padding: 40px;">
+        <p class="helptext">No items match your search.</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Rate Exchange{% endblock %}
+{% block content %}
+<div style="max-width: 440px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="font-size: 18px;">Rate {{ ratee.username }}</h1>
+        <p class="helptext" style="margin-top: 0;">For: {{ reservation.asset.title }}</p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field-row">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+            <button type="submit" style="width: 100%; text-align: center; background: var(--amber);">Submit rating</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

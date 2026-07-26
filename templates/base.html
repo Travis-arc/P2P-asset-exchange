@@ -1,0 +1,235 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}P2P Asset Exchange{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F0F2F5;
+            --surface: #FFFFFF;
+            --surface-2: #F7F8FA;
+            --nav: #111827;
+            --nav-text: #E5E7EB;
+            --border: #E4E7EC;
+            --border-strong: #D0D5DD;
+            --text: #101828;
+            --text-secondary: #475467;
+            --text-muted: #98A2B3;
+            --accent: #2563EB;
+            --accent-light: #EFF4FF;
+            --accent-hover: #1D4ED8;
+            --green: #12B76A;
+            --green-bg: #ECFDF3;
+            --amber: #F79009;
+            --amber-bg: #FFFAEB;
+            --red: #F04438;
+            --red-bg: #FEF3F2;
+            --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
+            --shadow-md: 0 4px 8px -2px rgba(16,24,40,0.08), 0 2px 4px -2px rgba(16,24,40,0.04);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            overflow-anchor: none;
+        }
+        header {
+            background: var(--nav);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: -0.01em;
+        }
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        nav a.nav-link {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--nav-text);
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        nav a.nav-link:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        main {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            padding: 28px;
+        }
+        h1 { font-size: 22px; font-weight: 700; margin-top: 0; letter-spacing: -0.02em; }
+        label { display: block; font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            color: var(--text);
+            background: var(--surface);
+            transition: border-color 0.15s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        button, .btn {
+            display: inline-block;
+            margin-top: 18px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        button:hover, .btn:hover { background: var(--accent-hover); }
+        .helptext { color: var(--text-muted); font-size: 12.5px; }
+        ul.errorlist { color: var(--red); font-size: 12.5px; padding-left: 18px; margin: 4px 0; }
+        .messages { list-style: none; padding: 0; margin: 0 0 20px; }
+        .messages li {
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+        .messages .success { background: var(--green-bg); color: var(--green); }
+        .messages .error { background: var(--red-bg); color: var(--red); }
+        .messages .info { background: var(--accent-light); color: var(--accent); }
+        .field-row { margin-bottom: 4px; }
+        dl { margin: 0; }
+        dt { font-size: 12.5px; color: var(--text-muted); margin-top: 16px; text-transform: uppercase; letter-spacing: 0.02em; }
+        dd { margin: 3px 0 0; font-size: 15px; }
+
+        /* Badges & pills, matching the Figma component set */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .badge-green { background: var(--green-bg); color: var(--green); }
+        .badge-amber { background: var(--amber-bg); color: var(--amber); }
+        .badge-red { background: var(--red-bg); color: var(--red); }
+        .badge-gray { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+        .pill {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        .chip {
+            display: inline-block;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border-strong);
+            transition: all 0.15s;
+        }
+        .chip:hover { border-color: var(--accent); }
+        .chip-active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="nav-inner">
+        <a class="brand" href="{% url 'listings:asset_list' %}">
+            <span class="brand-mark">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M2 7h10M7 2l5 5-5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            P2P Asset Exchange
+        </a>
+        <nav>
+            <nav>
+            {% if request.resolver_match.url_name != 'asset_list' and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+                <a class="nav-link" href="{% url 'listings:asset_list' %}">Browse Listings</a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                {% if request.resolver_match.url_name != 'profile' %}
+                    <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
+                {% endif %}
+                {% if request.resolver_match.url_name != 'my_reservations' %}
+                    <a class="nav-link" href="{% url 'transactions:my_reservations' %}">My Reservations</a>
+                {% endif %}
+                <a class="nav-link" href="{% url 'accounts:logout' %}">Log out</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+<main>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>

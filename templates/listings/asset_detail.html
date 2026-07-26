@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ asset.title }}{% endblock %}
+{% block content %}
+<div class="card">
+    {% if asset.photo %}
+        <img src="{{ asset.photo.url }}" alt="{{ asset.title }}" style="width:100%; max-height: 360px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom:20px;">
+    {% endif %}
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+        <h1 style="margin-bottom: 6px;">{{ asset.title }}</h1>
+        <span class="badge {% if asset.status == 'available' %}badge-green{% elif asset.status == 'reserved' %}badge-amber{% else %}badge-red{% endif %}" style="flex-shrink: 0; margin-top: 4px;">&#9679; {{ asset.get_status_display }}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+        <span class="pill">{{ asset.category.name }}</span>
+        <span class="helptext">{{ asset.get_condition_display }} condition &middot; posted {{ asset.created_at|date:"M d, Y" }}</span>
+    </div>
+
+    <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.6;">{{ asset.description|default:"No description provided." }}</p>
+
+    <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px; display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;">
+            {{ asset.owner.username|slice:":1"|upper }}
+        </div>
+        <div>
+            <div style="font-weight: 600; font-size: 14.5px;">{{ asset.owner.username }}</div>
+            <div class="helptext" style="margin-top: 0;">{{ asset.owner.department|default:"—" }} &middot; &#9733; {{ asset.owner.reputation_score }}/5.00</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap;">
+        {% if user.is_authenticated and user != asset.owner and asset.status == 'available' %}
+            <form method="post" action="{% url 'transactions:reservation_request' asset.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" style="margin-top: 0;">Request this item</button>
+            </form>
+        {% endif %}
+        {% if user == asset.owner %}
+            <a class="btn" href="{% url 'listings:asset_edit' asset.pk %}" style="margin-top: 0; background: var(--surface); color: var(--text); border: 1px solid var(--border-strong);">Edit</a>
+            {% if asset.status == 'available' %}
+                <a class="btn" href="{% url 'listings:asset_delete' asset.pk %}" style="margin-top: 0; background: var(--red-bg); color: var(--red);">Delete</a>
+            {% endif %}
+        {% endif %}
+        <a class="btn" href="{% url 'listings:asset_list' %}" style="margin-top: 0; background: var(--surface); color: var(--text); border: 1px solid var(--border-strong);">&larr; Back to all listings</a>
+    </div>
+</div>
+{% endblock %}
