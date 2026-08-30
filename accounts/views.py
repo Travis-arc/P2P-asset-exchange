@@ -1,3 +1,4 @@
+import resend
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -6,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.conf import settings
 
 from .forms import EmailLoginForm, RegistrationForm
 from .models import CustomUser
@@ -46,16 +48,29 @@ def _send_verification_email(request, user):
     verify_path = reverse('accounts:verify_email', args=[uid, token])
     verify_url = request.build_absolute_uri(verify_path)
 
-    send_mail(
-        subject="Verify your P2P Asset Exchange account",
-        message=(
-            f"Hi {user.username},\n\n"
-            f"Confirm your institutional email by visiting:\n{verify_url}\n\n"
-            "If you didn't create this account, ignore this message."
-        ),
-        from_email=None,
-        recipient_list=[user.email],
+    message_body = (
+        f"Hi {user.username},\n\n"
+        f"Confirm your institutional email by visiting:\n{verify_url}\n\n"
+        "If you didn't create this account, ignore this message."
     )
+
+    if settings.RESEND_API_KEY:
+        # Production: send a real email via Resend's HTTPS API.
+        resend.api_key = settings.RESEND_API_KEY
+        resend.Emails.send({
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": [user.email],
+            "subject": "Verify your P2P Asset Exchange account",
+            "text": message_body,
+        })
+    else:
+        # Local development: print to the console instead, as before.
+        send_mail(
+            subject="Verify your P2P Asset Exchange account",
+            message=message_body,
+            from_email=None,
+            recipient_list=[user.email],
+        )
 
 
 def verify_email_view(request, uidb64, token):
