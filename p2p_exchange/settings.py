@@ -145,21 +145,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Only these institutional email domains may register.
 ALLOWED_EMAIL_DOMAINS = ['stu.unizik.edu.ng']
-# In development we print "sent" emails to the console instead of
-# actually sending them, so you can see verification links while testing.
-# Use real Gmail SMTP whenever credentials are supplied (production);
-# otherwise fall back to printing emails to the console (local development).
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-
-if EMAIL_HOST_USER:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Resend (HTTPS API, not SMTP) is used in production since Railway blocks
+# outbound SMTP entirely. Locally, with no key set, we fall back to
+# printing emails to the console as before.
+RESEND_API_KEY = config('RESEND_API_KEY', default='')
+DEFAULT_FROM_EMAIL = 'P2P Asset Exchange <noreply@p2pxassets.online>'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'accounts:profile'
