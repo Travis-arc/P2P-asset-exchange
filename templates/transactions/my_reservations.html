@@ -15,7 +15,7 @@
     <h1 style="font-size: 16px; margin-bottom: 16px;">Requests I've Received</h1>
     {% if received %}
         {% for r in received %}
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); padding: 14px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); padding: 14px 0; flex-wrap: wrap;">
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-weight: 600; font-size: 14.5px;">{{ r.asset.title }}</span>

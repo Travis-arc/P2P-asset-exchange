@@ -191,6 +191,31 @@
             color: #fff;
             border-color: var(--accent);
         }
+                .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        /* Phone-width layout adjustments */
+        @media (max-width: 640px) {
+            .nav-inner {
+                padding: 0 16px;
+                height: auto;
+                flex-wrap: wrap;
+                gap: 8px 0;
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            .brand { font-size: 14px; }
+            nav { display: flex; flex-wrap: wrap; gap: 4px; }
+            nav a.nav-link { padding: 6px 10px; font-size: 12.5px; }
+            main { margin: 20px auto; padding: 0 16px; }
+            .card { padding: 18px; }
+            h1 { font-size: 19px; }
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
